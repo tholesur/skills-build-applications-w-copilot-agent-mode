@@ -30,13 +30,13 @@ OctoFit Tracker is a three-tier application for a school fitness program. The st
 
 Record your plan here before editing code.
 
-- Presentation tier decision:
-- Logic tier decision:
-- Data tier decision:
-- Activity tracking approach:
-- Team management approach:
-- Leaderboard approach:
-- Workout suggestions approach:
+- Presentation tier decision: Keep React route views focused on rendering and interaction. Use the shared API client for relative `/api` requests and give each view accessible loading, error, empty, and populated states; keep business rules out of the UI.
+- Logic tier decision: Keep Express routes responsible for HTTP input validation and status codes, with business rules and database queries in `octofitService.ts`. Validate ID formats and referenced records before writes; keep the API on port `8000` and do not add authentication.
+- Data tier decision: Use Mongoose schemas for required fields, references, and safe defaults such as an empty team member list. Keep the seed idempotent and additive so reruns preserve unrelated records; use MongoDB on port `27017`.
+- Activity tracking approach: Accept `userId`, `teamId`, `type`, and positive `minutes`; validate that both referenced records exist, then persist their references with `occurredAt` and deterministic points (initially one point per minute). Return deliberate 4xx responses for invalid or missing references.
+- Team management approach: Require a non-empty name, preserve the submitted name and mascot, and default members to an empty list. Validate member references before saving and keep team membership consistent when creating or listing teams.
+- Leaderboard approach: Aggregate activity points by team, include teams with no activity at zero points, sort highest total first with a deterministic tie-break, and return `teamName`, `totalPoints`, and one-based `rank`.
+- Workout suggestions approach: Find the user by email, select a focus from their fitness goal or recent activity, and return matching workouts with a concise reason tied to that signal. Return a deliberate 4xx response when no user matches.
 
 ## Test plan
 
