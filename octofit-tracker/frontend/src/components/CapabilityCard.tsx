@@ -5,7 +5,7 @@ type ApiRecord = Record<string, unknown>;
 type Props = {
   title: string;
   description: string;
-  endpoint: string;
+  loadRecords: () => Promise<Record<string, ApiRecord[]>>;
   collectionKey: string;
   emptyMessage: string;
 };
@@ -16,7 +16,7 @@ function displayValue(value: unknown): string {
   return String(value ?? '');
 }
 
-export function CapabilityCard({ title, description, endpoint, collectionKey, emptyMessage }: Props) {
+export function CapabilityCard({ title, description, loadRecords, collectionKey, emptyMessage }: Props) {
   const [records, setRecords] = useState<ApiRecord[] | null>(null);
   const [hasError, setHasError] = useState(false);
 
@@ -25,7 +25,7 @@ export function CapabilityCard({ title, description, endpoint, collectionKey, em
     setRecords(null);
     setHasError(false);
 
-    getJson<Record<string, ApiRecord[]>>(endpoint)
+    loadRecords()
       .then((response) => {
         if (active) setRecords(Array.isArray(response[collectionKey]) ? response[collectionKey] : []);
       })
@@ -36,7 +36,7 @@ export function CapabilityCard({ title, description, endpoint, collectionKey, em
     return () => {
       active = false;
     };
-  }, [collectionKey, endpoint]);
+  }, [collectionKey, loadRecords]);
 
   return (
     <section className="card h-100">
